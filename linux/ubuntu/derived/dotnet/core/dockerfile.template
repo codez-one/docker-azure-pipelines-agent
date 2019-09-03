@@ -1,0 +1,28 @@
+FROM $(DOCKER_REGISTRY)/$(DOCKER_NAME):$(AZDO_AGENT_TAG)
+
+LABEL name="$(DOCKER_REGISTRY)/$(DOCKER_NAME):$(AZDO_AGENT_TAG)-dotnet-core-$(DOTNET_CORE_VERSION)" \
+      maintainer="CodeZ.one - Kirsten Kluge" \
+      version="0.1.0"
+
+WORKDIR /usr
+
+RUN yum -y install \
+      deltarpm \
+      epel-release \
+      unzip \
+      libunwind \
+      gettext \
+      libcurl-devel \
+      openssl-devel \
+      zlib \
+      libicu-devel \
+      && set -x \
+      && export DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+      && curl -sSL -o dotnet-install.sh https://dot.net/v1/dotnet-install.sh \
+      && chmod +x dotnet-install.sh \
+      && ./dotnet-install.sh  -Channel "Current" -Version "$(DOTNET_CORE_SDK_VERSION)" --install-dir /opt/dotnet --no-path \
+      && ln -s /opt/dotnet/dotnet /usr/local/bin \
+      && dotnet help >/dev/null \
+      && yum clean all
+
+ENV dotnet=/usr/bin/dotnet

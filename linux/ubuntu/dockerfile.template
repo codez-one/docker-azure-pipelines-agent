@@ -1,0 +1,39 @@
+FROM ubuntu:$(UBUNTU_VERSION)
+
+LABEL name="$(DOCKER_REGISTRY)/$(DOCKER_NAME):ubuntu-$(UBUNTU_VERSION)" \
+      maintainer="CodeZ.one - Kirsten Kluge" \
+      version="0.1.0"
+
+ARG PROXY=""
+ARG NO_PROXY=""
+
+ENV http_proxy=$PROXY
+ENV https_proxy=$PROXY
+ENV no_proxy=$NO_PROXY
+
+# To make it easier for build and release pipelines to run apt-get,
+# configure apt to not require confirmation (assume the -y argument by default)
+ENV DEBIAN_FRONTEND=noninteractive
+RUN echo "APT::Get::Assume-Yes \"true\";" > /etc/apt/apt.conf.d/90assumeyes
+
+RUN apt-get update  \
+ && apt-get install apt-utils -y
+RUN apt-get install -y --no-install-recommends \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    file \
+    ftp \
+    git \
+    gnupg \
+    iproute2 \
+    iputils-ping \
+    locales \
+    lsb-release \
+    sudo \
+    time \
+    unzip \
+    wget \
+    zip \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean

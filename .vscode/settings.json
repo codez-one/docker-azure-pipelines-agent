@@ -1,0 +1,6 @@
+{
+    "files.eol": "\n",
+    "files.associations": {
+        "**/pipelines/*.yaml": "azure-pipelines"
+    }
+}

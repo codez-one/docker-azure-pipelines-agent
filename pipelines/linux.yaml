@@ -1,0 +1,19 @@
+trigger:
+- master
+
+jobs:
+- job: Linux
+  displayName: 'Build linux images'
+  pool:
+    vmImage: 'ubuntu-latest'
+  workspace:
+    clean: all
+  variables:
+    workingDirectory: '$(Build.SourcesDirectory)/linux/'
+  steps:
+  - script: |
+      cd $(workingDirectory)
+      chmod 777 *.sh
+      ./build.sh
+    displayName: 'Build images'
+    workingDirectory: $(workingDirectory)

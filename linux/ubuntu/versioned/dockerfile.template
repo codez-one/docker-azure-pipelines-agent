@@ -1,0 +1,22 @@
+FROM $(DOCKER_REGISTRY)/$(DOCKER_NAME):ubuntu-$(UBUNTU_VERSION)
+
+LABEL name="$(DOCKER_REGISTRY)/$(DOCKER_NAME):ubuntu-$(UBUNTU_VERSION)-$(AZDO_AGENT_VERSION)" \
+      maintainer="CodeZ.one - Kirsten Kluge" \
+      version="0.1.0"
+
+COPY ./runAgent.sh /azdo/
+
+RUN chmod +x /azdo/runAgent.sh \
+ && set -x \
+ && cd /azdo \
+ && curl -s -fSL https://vstsagentpackage.azureedge.net/agent/$(AZDO_AGENT_VERSION)/vsts-agent-linux-x64-$(AZDO_AGENT_VERSION).tar.gz -o agent.tgz \
+ && mkdir agent \
+ && cd agent \
+ && tar -xzf ../agent.tgz \
+ && chown -R root:root . \
+ && cd .. \
+ && rm agent.tgz
+
+RUN /azdo/agent/bin/installdependencies.sh
+
+CMD ["/azdo/runAgent.sh"]
