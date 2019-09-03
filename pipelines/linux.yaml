@@ -17,3 +17,15 @@ jobs:
       ./build.sh
     displayName: 'Build images'
     workingDirectory: $(workingDirectory)
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'czon Docker Hub'
+      command: 'login'
+      addPipelineData: false
+  - script: |
+      cd $(workingDirectory)
+      ./push.sh
+    displayName: 'Push images'
+    workingDirectory: $(workingDirectory)
+    
