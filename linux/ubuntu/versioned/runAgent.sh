@@ -37,7 +37,7 @@ fi
 
 arg_agent_auth=
 if [ "$AZDO_USER" ] && [ "$AZDO_PASSWORD" ]; then
-  arg_agent_auth="--auth negotiate --username \"$AZDO_USER\" --password \"$AZDO_PASSWORD\""
+  arg_agent_auth="--auth negotiate --username $AZDO_USER --password $AZDO_PASSWORD"
 else
   arg_agent_auth="--auth PAT --token $AZDO_TOKEN"
 fi

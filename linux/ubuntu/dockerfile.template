@@ -26,6 +26,7 @@ RUN apt-get install -y --no-install-recommends \
     ftp \
     git \
     gnupg \
+    gss-ntlmssp \
     iproute2 \
     iputils-ping \
     locales \
