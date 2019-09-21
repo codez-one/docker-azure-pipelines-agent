@@ -1,8 +1,21 @@
 #!/bin/bash
 set -e
 
-env_exclude=( "AZDO_USER" "AZDO_PASSWORD" "AZDO_TOKEN" )
+env_exclude=( "AZDO_USER" "AZDO_PASSWORD" "AZDO_TOKEN" "AZDO_ENV_EXCLUDE" "AZDO_ENV_INCLUDE" )
 env_include=( )
+
+originalIFS=$IFS
+IFS=','
+if [ -n "$AZDO_ENV_EXCLUDE" ]; then
+  read -a external_exclude <<< ${AZDO_ENV_EXCLUDE%','}
+  env_exclude+=( ${external_exclude[@]} )
+fi
+if [ -n "$AZDO_ENV_INCLUDE" ]; then
+  read -a external_include <<< ${AZDO_ENV_INCLUDE%','}
+  env_include+=( ${external_include[@]} )
+fi
+IFS=$originalIFS
+
 
 if [ -z "$AZDO_URL" ]; then
   echo 1>&2 error: missing AZDO_URL environment variable
@@ -80,7 +93,7 @@ source ./env.sh
 print_message "Configure Agent ..."
 
 ./bin/Agent.Listener configure --unattended --acceptTeeEula \
-  --agent "${AZDO_AGENT:-CentOS_$(hostname)}" \
+  --agent "${AZDO_AGENT:-Agent_$(hostname)}" \
   --url "$AZDO_URL" \
   $arg_agent_auth \
   --pool "${AZDO_POOL:-Default}" \
@@ -91,4 +104,7 @@ print_message "    Done."
 
 print_message "Starting Agent ..."
 
-env ${env_exclude[@]/#/-u } "${env_include[@]}" ./run.sh $arg_agent_once & wait $!
+# echo "Exclude: ${env_exclude[@]/#/--unset=}"
+# echo "Include: ${env_include[@]}"
+
+env ${env_exclude[@]/#/--unset=} "${env_include[@]}" ./run.sh $arg_agent_once & wait $!

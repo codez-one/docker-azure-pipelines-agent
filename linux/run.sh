@@ -154,6 +154,7 @@ docker run \
   -e AZDO_URL="$server" \
   $arg_agent_auth \
   -e AZDO_POOL="$pool" \
+  -e AZDO_ENV_INCLUDE='Agent.Project=My Awesome Project,Agent.Test=blubb' \
   $arg_azdo_agent \
   $arg_azdo_agent_dispose \
   $arg_docker_restart \

@@ -17,8 +17,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN echo "APT::Get::Assume-Yes \"true\";" > /etc/apt/apt.conf.d/90assumeyes
 
 RUN apt-get update  \
- && apt-get install apt-utils -y
-RUN apt-get install -y --no-install-recommends \
+ && apt-get install apt-utils
+RUN apt-get install --no-install-recommends \
     apt-transport-https \
     ca-certificates \
     curl \
