@@ -16,25 +16,33 @@ if [ -n "$AZDO_ENV_INCLUDE" ]; then
 fi
 IFS=$originalIFS
 
-
 if [ -z "$AZDO_URL" ]; then
   echo 1>&2 error: missing AZDO_URL environment variable
   exit 1
 fi
 
-if [ -z "$AZDO_USER" ] && [ -z "$AZDO_TOKEN" ]; then
-  echo 1>&2 error: missing AZDO_USER environment variable
-  exit 1
-fi
+# Check if token is present
+if [ -z "$AZDO_TOKEN" -a -z "$AZDO_TOKEN_FILE" ]; then
+  # No token found
+  # Check if User was given
+  if [ -z "$AZDO_USER" ]; then
+    # No User found
+    echo 1>&2 error: missing AZDO_USER environment variable
+    exit 1
+  fi
 
-if [ -z "$AZDO_PASSWORD" ] && [ -z "$AZDO_TOKEN" ]; then
-  echo 1>&2 error: missing AZDO_PASSWORD environment variable
-  exit 1
-fi
+  # Check if Password was given
+  if [ -z "$AZDO_PASSWORD" -a -z "$AZDO_PASSWORD_FILE" ]; then
+    # No Password found
+    echo 1>&2 error: missing AZDO_PASSWORD or AZDO_PASSWORD_FILE environment variable
+    exit 1
+  fi
 
-if [ -z "$AZDO_USER" ] && [  -z "$AZDO_PASSWORD" ] && [ -z "$AZDO_TOKEN" ]; then
-  echo 1>&2 error: missing AZDO_TOKEN environment variable
-  exit 1
+  # Token must be used when no User and Password was given
+  if [ -z "$AZDO_USER" ] && [ -z "$AZDO_PASSWORD" -a -z "$AZDO_PASSWORD_FILE" ]; then
+    echo 1>&2 error: missing AZDO_TOKEN or AZDO_TOKEN_FILE environment variable
+    exit 1
+  fi
 fi
 
 if [ -n "$AZDO_AGENT" ]; then
@@ -49,10 +57,25 @@ if [ -n "$AZDO_WORK" ]; then
 fi
 
 arg_agent_auth=
-if [ "$AZDO_USER" ] && [ "$AZDO_PASSWORD" ]; then
-  arg_agent_auth="--auth negotiate --username $AZDO_USER --password $AZDO_PASSWORD"
+# When user and either a password or a password file is present
+if [ -n "$AZDO_USER" ] && [ -n "$AZDO_PASSWORD" -o -n "$AZDO_PASSWORD_FILE" ]; then
+  # When no password file was given write the password to a file in the default location
+  if [ -z "$AZDO_PASSWORD_FILE" ]; then
+    AZDO_PASSWORD_FILE=/azdo/.password
+    echo -n $AZDO_PASSWORD > "$AZDO_PASSWORD_FILE"
+  fi
+  # Clear the password from the container
+  unset AZDO_PASSWORD
+  arg_agent_auth="--auth negotiate --username $AZDO_USER --password $(cat "$AZDO_PASSWORD_FILE")"
 else
-  arg_agent_auth="--auth PAT --token $AZDO_TOKEN"
+  # When no token file was given write the token to a file in the default location
+  if [ -z "$AZDO_TOKEN_FILE" ]; then
+    AZDO_TOKEN_FILE=/azdo/.token
+    echo -n $AZDO_TOKEN > "$AZDO_TOKEN_FILE"
+  fi
+  # Clear the token from the container
+  unset AZDO_TOKEN
+  arg_agent_auth="--auth PAT --token $(cat "$AZDO_TOKEN_FILE")"
 fi
 
 arg_agent_once=
@@ -64,7 +87,8 @@ fi
 cd /azdo/agent
 
 cleanup() {
-  trap '' EXIT # some shells will call EXIT after the INT handler
+  # some shells will call EXIT after the INT handler
+  trap '' EXIT
   ./bin/Agent.Listener remove --unattended \
     $arg_agent_auth
 }
@@ -75,6 +99,7 @@ print_message() {
   echo -e "${lightcyan}$1${nocolor}"
 }
 
+# When there is a old configuration perform a cleanup
 if [ -e .agent ]; then
   echo "Removing existing AZDO agent configuration..."
   cleanup
@@ -84,7 +109,7 @@ trap 'cleanup; exit 130' INT
 trap 'cleanup; exit 143' TERM
 trap 'cleanup; exit 0' EXIT
 
-VSO_AGENT_IGNORE=_,MAIL,OLDPWD,PATH,PWD,VSO_AGENT_IGNORE,AZDO_AGENT,AZDO_URL,AZDO_USER,AZDO_PASSWORD,AZDO_POOL,AZDO_WORK,AZDO_AGENT_DISPOSE,AZDO_ENV_IGNORE,DOTNET_CLI_TELEMETRY_OPTOUT,AGENT_ALLOW_RUNASROOT,DEBIAN_FRONTEND
+VSO_AGENT_IGNORE=_,MAIL,OLDPWD,PATH,PWD,VSO_AGENT_IGNORE,AZDO_AGENT,AZDO_URL,AZDO_USER,AZDO_PASSWORD,AZDO_TOKEN_FILE,AZDO_PASSWORD_FILE,AZDO_POOL,AZDO_WORK,AZDO_AGENT_DISPOSE,AZDO_ENV_IGNORE,DOTNET_CLI_TELEMETRY_OPTOUT,AGENT_ALLOW_RUNASROOT,DEBIAN_FRONTEND
 
 if [ -n "$AZDO_ENV_IGNORE" ]; then
   VSO_AGENT_IGNORE+=",$AZDO_ENV_IGNORE"
