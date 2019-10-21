@@ -1,60 +1,34 @@
 # Azure Pipelines Agent Docker Container
 
-This is a Docker based project for automatically generating docker images for Azure DevOps Pipelines Agents with specified Versions.
-
-> **Caution**: This is work in progress and not ready for production use jet!
+This is a Docker based project for automatically generating docker images for Azure DevOps Pipelines Agents with specified Versions. The resulting Docker images should be used as a base for project specific agents that are customized to the needs for the pipeline in your project.
 
 > **Info**: The Windows images are not maintained at the moment.
 
-## Goal 
-This project should be the basement for automated Build Agent Pools. In order to accomplish the following goals:
- - Each project can build its own Tool and Version specific Build Machine, based on a docker image, without intevening other Project builds. 
- - The Docker Images (Build Machines) are versioned, this allows easy rollback mechanisms, if an update of a Tool failed.
- - The scalability of Agents improves significantly (The number of Agents can be increased according to load)
-
 ## How to use these images
-Azure Pipelines agents must be started with account connection information, which is provided through two environment variables:
-
-- `AZDO_ACCOUNT`: the name of the Visual Studio account
-- `AZDO_TOKEN`: a personal access token (PAT) for the Visual Studio account that has been given at least the **Agent Pools (read, manage)** scope.
+Azure Pipelines agents must be started with account connection information, which is provided through environment variables listet below.
 
 To run the default Azure Pipelines agent image for a specific Azure DevOps account:
 
 ```
 docker run \
-  -e AZDO_ACCOUNT=<name> \
+  -e AZDO_URL=<url> \
   -e AZDO_TOKEN=<pat> \
   -it czon/azdo-agent
-```
-
-When using an image that targets a specific TFS version, the connection information is instead supplied through one of the following environment variables:
-
-- `TFS_HOST`: the hostname of the Team Foundation Server
-- `TFS_URL`: the full URL of the Team Foundation Server
-- `AZDO_TOKEN`: a personal access token (PAT) for the Team Foundation Server account that has been given at least the **Agent Pools (read, manage)** scope.
-
-If `TFS_HOST` is provided, the TFS URL is set to `https://$TFS_HOST/tfs`. If `TFS_URL` is provided, any `TFS_HOST` environment variable is ignored.
-
-To run a VSTS agent image for TFS 2018 that identifies the server at `https://mytfs/tfs`:
-
-```
-docker run \
-  -e TFS_HOST=mytfs \
-  -e AZDO_TOKEN=<pat> \
-  -it microsoft/vsts-agent:ubuntu-16.04-tfs-2018
 ```
 
 A more secure option for passing the personal access token is supported by mounting a file that contains the token into the container and specifying the location of this file with the `AZDO_TOKEN_FILE` environment variable. For instance:
 
 ```
 docker run \
-  -v /path/to/my/token:/vsts-token \
-  -e AZDO_ACCOUNT=<name> \
-  -e AZDO_TOKEN_FILE=/vsts-token \
-  -it microsoft/vsts-agent
+  -v /path/to/my/token:/azdo-token \
+  -e AZDO_URL=<url> \
+  -e AZDO_TOKEN_FILE=/azdo-token \
+  -it czon/azdo-agent
 ```
 
-Whether targeting VSTS or TFS, agents can be further configured with additional environment variables:
+The same applies for the usage of the `AZDO_PASSWORD` environment variable. It is better to use `AZDO_PASSWORD_FILE`.
+
+Agents can be further configured with additional environment variables:
 
 - `AZDO_AGENT`: the name of the agent (default: `"$(hostname)"`)
 - `AZDO_POOL`: the name of the agent pool (default: `"Default"`)
@@ -62,18 +36,87 @@ Whether targeting VSTS or TFS, agents can be further configured with additional 
 
 The `AZDO_AGENT` and `AZDO_WORK` values are evaluated inside the container as an expression so they can use shell expansions. The `AZDO_AGENT` value is evaluated first, so the `AZDO_WORK` value may reference the expanded `AZDO_AGENT` value.
 
-To run a VSTS agent on Ubuntu 18.04 for a specific account with a custom agent name, pool and a volume mapped agent work folder:
+To run a Azure DevOps agent on Ubuntu 18.04 for a specific account with a custom agent name, pool and a volume mapped agent work folder:
 
 ```
 docker run \
-  -e AZDO_ACCOUNT=<name> \
+  -e AZDO_URL=<url> \
   -e AZDO_TOKEN=<pat> \
   -e AZDO_AGENT='$(hostname)-agent' \
   -e AZDO_POOL=mypool \
-  -e AZDO_WORK='/var/vsts/$AZDO_AGENT' \
-  -v /var/vsts:/var/vsts \
-  -it microsoft/vsts-agent:ubuntu-18.04
+  -e AZDO_WORK='/var/azdo/$AZDO_AGENT' \
+  -v /var/azdo:/var/azdo \
+  -it czon/azdo-agent:ubuntu-18.04
 ```
+
+## Configuration
+
+All the variables below will be ignored by the agent by default and will not be visible as capabilities of the agent
+
+### Required
+
+`AZDO_URL`
+
+The complete url of the Azure DevOps account (e.g. "https://dev.azure.com/czon/" or "https://tfs.company.com/tfs/").
+
+#### Authentification with Token (recommended)
+
+`AZDO_TOKEN`
+
+A personal access token (PAT) for the Azure DevOps account that has been given at least the **Agent Pools (read, manage)** scope.
+
+`AZDO_TOKEN_FILE`
+
+A path to a simple File with only the token in it.
+
+> **Caution** Be aware of that this file can be accessed inside a job running on the agent.
+
+#### Authentification with User and Password
+
+This option is **not recommended** becouse the values can not be stored safely and if someone get acces to it he can login to AzDO as this user.
+
+`AZDO_USER`
+
+`AZDO_PASSWORD`
+
+`AZDO_PASSWORD_FILE`
+
+A path to a simple File with only the password in it.
+
+> **Caution** Be aware of that this file can be accessed inside a job running on the agent.
+
+### Optional
+
+#### Environment
+
+`AZDO_AGENT`
+
+The Name of the Agent as it will appear in the agent pool view of AzDO
+
+`AZDO_WORK`
+
+If you want the agent to use an other forlder for his jobs you can specify it here. The default is: `/azdo/agent/_work/`
+
+`AZDO_ENV_IGNORE`
+
+This is a `,` seperated list of environment variables which will be ignored by the agent while scanning for capabilities. This may be usefull if you have avariable used in your dokerfile but do not want it to show up in the capabilities list-
+
+`AZDO_ENV_EXCLUDE`
+
+This is a `,` seperated list of environment variables which will be excludes from the environment the agent is running in. This is usefull for variables with secrets that are not necessary at the runtime of the agent.
+
+`AZDO_ENV_INCLUDE`
+
+This is a `,` seperated list of environment variables which will be added to the environment the agent is running in. For example you can add something like that: `"Agent.Project=Sample Project"`. With this you can use this value in the demands of your job.
+
+#### Behaviour
+
+`AZDO_AGENT_DISPOSE`
+
+The agent will take only one job and than shut down and deregister itself.
+
+> **Caution** as of now there is a bug in the agent the prevent this option to work reliable!  
+See here: https://github.com/microsoft/azure-pipelines-agent/issues/2332
 
 ## Development
 
@@ -95,7 +138,7 @@ To run a container and register it in Azure DevOps run `run.sh`.
 Example:
 
 ```
-./run.sh czon/azdo-agent:ubuntu-stretch-slim-2.155.1 -s https://dev.azure.com/czon/ -n TestAgent01 -p DockerSamples -c -d -i
+./run.sh czon/azdo-agent:ubuntu-18.04-2.155.1 -s https://dev.azure.com/czon/ -n TestAgent01 -p DockerSamples -c -d -i
 ```
 
 ### Contribute
