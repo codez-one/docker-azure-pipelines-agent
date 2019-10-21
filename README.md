@@ -1,5 +1,12 @@
 # Azure Pipelines Agent Docker Container
 
+[![Downloads from Docker Hub](https://img.shields.io/docker/pulls/czon/azdo-agent.svg)](https://registry.hub.docker.com/u/czon/azdo-agent)
+[![Stars on Docker Hub](https://img.shields.io/docker/stars/czon/azdo-agent.svg)](https://registry.hub.docker.com/u/czon/azdo-agent)
+[![](https://images.microbadger.com/badges/image/czon/azdo-agent.svg)](https://microbadger.com/images/czon/azdo-agent)
+[![](https://images.microbadger.com/badges/version/czon/azdo-agent.svg)](https://microbadger.com/images/czon/azdo-agent)
+[![Build Status](https://dev.azure.com/czon/Docker%20Azure%20Pipelines%20Agent/_apis/build/status/codez-one.docker-azure-pipelines-agent?branchName=master)](https://dev.azure.com/czon/Docker%20Azure%20Pipelines%20Agent/_build/latest?definitionId=2&branchName=master)
+
+
 This is a Docker based project for automatically generating docker images for Azure DevOps Pipelines Agents with specified Versions. The resulting Docker images should be used as a base for project specific agents that are customized to the needs for the pipeline in your project.
 
 > **Info**: The Windows images are not maintained at the moment.
