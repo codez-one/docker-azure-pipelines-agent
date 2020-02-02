@@ -19,13 +19,17 @@ jobs:
     workingDirectory: $(workingDirectory)
 
   - task: Docker@2
+    displayName: 'Docker Login'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     inputs:
       containerRegistry: 'czon Docker Hub'
       command: 'login'
       addPipelineData: false
+  
   - script: |
       cd $(workingDirectory)
       ./push.sh
     displayName: 'Push images'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     workingDirectory: $(workingDirectory)
     
