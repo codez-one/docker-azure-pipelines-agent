@@ -78,6 +78,19 @@ else
   arg_agent_auth="--auth PAT --token $(cat "$AZDO_TOKEN_FILE")"
 fi
 
+arg_pool=
+# When a deploment pool is given
+if [ -n "$AZDO_DEPLOYMENT_POOL" ]; then
+  if [ -n "$AZDO_POOL" ]; then
+    echo 1>&2 error: cannot set AZDO_DEPLOYMENT_POOL and AZDO_POOL environment variables
+    exit 1
+  fi
+
+  arg_pool="--deploymentpool --deploymentpoolname $AZDO_DEPLOYMENT_POOL"
+else
+  arg_pool="--pool $AZDO_POOL"
+fi
+
 arg_agent_once=
 if [ "$AZDO_AGENT_DISPOSE" = true ]; then
   env_include+=( "Agent.RunOnce=true" )
@@ -109,7 +122,7 @@ trap 'cleanup; exit 130' INT
 trap 'cleanup; exit 143' TERM
 trap 'cleanup; exit 0' EXIT
 
-VSO_AGENT_IGNORE=_,MAIL,OLDPWD,PATH,PWD,VSO_AGENT_IGNORE,AZDO_AGENT,AZDO_URL,AZDO_USER,AZDO_PASSWORD,AZDO_TOKEN_FILE,AZDO_PASSWORD_FILE,AZDO_POOL,AZDO_WORK,AZDO_AGENT_DISPOSE,AZDO_ENV_IGNORE,DOTNET_CLI_TELEMETRY_OPTOUT,AGENT_ALLOW_RUNASROOT,DEBIAN_FRONTEND
+VSO_AGENT_IGNORE=_,MAIL,OLDPWD,PATH,PWD,VSO_AGENT_IGNORE,AZDO_AGENT,AZDO_URL,AZDO_USER,AZDO_PASSWORD,AZDO_TOKEN_FILE,AZDO_PASSWORD_FILE,AZDO_POOL,AZDO_DEPLOYMENT_POOL,AZDO_WORK,AZDO_AGENT_DISPOSE,AZDO_ENV_IGNORE,DOTNET_CLI_TELEMETRY_OPTOUT,AGENT_ALLOW_RUNASROOT,DEBIAN_FRONTEND
 
 if [ -n "$AZDO_ENV_IGNORE" ]; then
   VSO_AGENT_IGNORE+=",$AZDO_ENV_IGNORE"
@@ -126,7 +139,7 @@ print_message "Configure Agent ..."
   --agent "${AZDO_AGENT:-Agent_$(hostname)}" \
   --url "$AZDO_URL" \
   $arg_agent_auth \
-  --pool "${AZDO_POOL:-Default}" \
+  $arg_pool \
   --work "${AZDO_WORK:-_work}" \
   --replace & wait $!
 

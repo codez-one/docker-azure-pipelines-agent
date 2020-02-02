@@ -39,6 +39,7 @@ Agents can be further configured with additional environment variables:
 
 - `AZDO_AGENT`: the name of the agent (default: `"$(hostname)"`)
 - `AZDO_POOL`: the name of the agent pool (default: `"Default"`)
+- `AZDO_DEPLOYMENT_POOL`: the name of the deployment pool (no default) - cannot be combined with `AZDO_POOL`
 - `AZDO_WORK`: the agent work folder (default: `"_work"`)
 
 The `AZDO_AGENT` and `AZDO_WORK` values are evaluated inside the container as an expression so they can use shell expansions. The `AZDO_AGENT` value is evaluated first, so the `AZDO_WORK` value may reference the expanded `AZDO_AGENT` value.

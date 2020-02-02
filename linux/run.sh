@@ -10,6 +10,7 @@ die() {
 run=
 name=
 pool=AZDO-Agent-Test
+deploymentpool=
 server=https://dev.azure.com/czon/
 continuous=
 dispose=
@@ -46,6 +47,15 @@ while [[ $# -gt 0 ]]; do
                 shift
             else
                 die 'ERROR: "--pool" requires a non-empty option argument.'
+            fi
+            ;;
+        --deploymentpool)
+            if [ "$2" ]; then
+                deploymentpool=$2
+                echo "Deployment Pool: '$deploymentpool'"
+                shift
+            else
+                die 'ERROR: "--deploymentpool" requires a non-empty option argument.'
             fi
             ;;
         -s|--server)
@@ -150,10 +160,17 @@ else
   arg_docker_interactive="-d"
 fi
 
+arg_pool=
+if [ -n "$deploymentpool" ]; then
+  arg_pool="-e AZDO_DEPLOYMENT_POOL=$deploymentpool"
+else
+  arg_pool="-e AZDO_POOL=$pool"
+fi
+
 docker run \
   -e AZDO_URL="$server" \
   $arg_agent_auth \
-  -e AZDO_POOL="$pool" \
+  $arg_pool \
   -e AZDO_ENV_INCLUDE='Agent.Project=My Awesome Project,Agent.Test=blubb' \
   $arg_azdo_agent \
   $arg_azdo_agent_dispose \
