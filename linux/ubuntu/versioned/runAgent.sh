@@ -78,7 +78,7 @@ else
   arg_agent_auth="--auth PAT --token $(cat "$AZDO_TOKEN_FILE")"
 fi
 
-arg_pool=
+arg_pool_params=
 # When a deploment pool is given
 if [ -n "$AZDO_DEPLOYMENT_POOL" ]; then
   if [ -n "$AZDO_POOL" ]; then
@@ -86,9 +86,9 @@ if [ -n "$AZDO_DEPLOYMENT_POOL" ]; then
     exit 1
   fi
 
-  arg_pool="--deploymentpool --deploymentpoolname $AZDO_DEPLOYMENT_POOL"
+  arg_pool_params=(--deploymentpool --deploymentpoolname "$AZDO_DEPLOYMENT_POOL")
 else
-  arg_pool="--pool $AZDO_POOL"
+  arg_pool_params=(--pool "$AZDO_POOL")
 fi
 
 arg_agent_once=
@@ -139,7 +139,7 @@ print_message "Configure Agent ..."
   --agent "${AZDO_AGENT:-Agent_$(hostname)}" \
   --url "$AZDO_URL" \
   $arg_agent_auth \
-  $arg_pool \
+  "${arg_pool_params[@]}" \
   --work "${AZDO_WORK:-_work}" \
   --replace & wait $!
 

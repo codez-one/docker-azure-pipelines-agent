@@ -160,17 +160,17 @@ else
   arg_docker_interactive="-d"
 fi
 
-arg_pool=
+arg_pool_params=
 if [ -n "$deploymentpool" ]; then
-  arg_pool="-e AZDO_DEPLOYMENT_POOL=$deploymentpool"
+  arg_pool_params=(-e AZDO_DEPLOYMENT_POOL="$deploymentpool")
 else
-  arg_pool="-e AZDO_POOL=$pool"
+  arg_pool_params=(-e AZDO_POOL="$pool")
 fi
 
 docker run \
   -e AZDO_URL="$server" \
   $arg_agent_auth \
-  $arg_pool \
+  "${arg_pool_params[@]}" \
   -e AZDO_ENV_INCLUDE='Agent.Project=My Awesome Project,Agent.Test=blubb' \
   $arg_azdo_agent \
   $arg_azdo_agent_dispose \
