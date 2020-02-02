@@ -122,9 +122,6 @@ This is a `,` seperated list of environment variables which will be added to the
 
 The agent will take only one job and than shut down and deregister itself.
 
-> **Caution** as of now there is a bug in the agent the prevent this option to work reliable!  
-See here: https://github.com/microsoft/azure-pipelines-agent/issues/2332
-
 ## Development
 
 ### Getting Started
