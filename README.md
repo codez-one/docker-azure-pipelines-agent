@@ -6,7 +6,6 @@
 [![](https://images.microbadger.com/badges/version/czon/azdo-agent.svg)](https://microbadger.com/images/czon/azdo-agent)
 [![Build Status](https://dev.azure.com/czon/Docker%20Azure%20Pipelines%20Agent/_apis/build/status/codez-one.docker-azure-pipelines-agent?branchName=master)](https://dev.azure.com/czon/Docker%20Azure%20Pipelines%20Agent/_build/latest?definitionId=2&branchName=master)
 
-
 This is a Docker based project for automatically generating docker images for Azure DevOps Pipelines Agents with specified Versions. The resulting Docker images should be used as a base for project specific agents that are customized to the needs for the pipeline in your project.
 
 > **Info**: The Windows images are not maintained at the moment.
@@ -39,7 +38,7 @@ Agents can be further configured with additional environment variables:
 
 - `AZDO_AGENT`: the name of the agent (default: `"$(hostname)"`)
 - `AZDO_POOL`: the name of the agent pool (default: `"Default"`)
-- `AZDO_DEPLOYMENT_POOL`: the name of the deployment pool (no default) - cannot be combined with `AZDO_POOL`
+- `AZDO_DEPLOYMENT_POOL`: the name of the deployment pool (no default; cannot be combined with `AZDO_POOL`)
 - `AZDO_WORK`: the agent work folder (default: `"_work"`)
 
 The `AZDO_AGENT` and `AZDO_WORK` values are evaluated inside the container as an expression so they can use shell expansions. The `AZDO_AGENT` value is evaluated first, so the `AZDO_WORK` value may reference the expanded `AZDO_AGENT` value.
@@ -65,7 +64,7 @@ All the variables below will be ignored by the agent by default and will not be 
 
 `AZDO_URL`
 
-The complete url of the Azure DevOps account (e.g. "https://dev.azure.com/czon/" or "https://tfs.company.com/tfs/").
+The complete url of the Azure DevOps account (e.g. `"https://dev.azure.com/czon/"` or `"https://tfs.company.com/tfs/"`).
 
 #### Authentification with Token (recommended)
 
@@ -124,14 +123,14 @@ This is a `,` seperated list of environment variables which will be added to the
 The agent will take only one job and than shut down and deregister itself.
 
 > **Caution** as of now there is a bug in the agent the prevent this option to work reliable!  
-See here: https://github.com/microsoft/azure-pipelines-agent/issues/2332
+> See here: [microsoft/azure-pipelines-agent#2332](https://github.com/microsoft/azure-pipelines-agent/issues/2332)
 
 ## Development
 
 ### Getting Started
 > Notice: The preferred Development Environment is Windows with the integrated WSL Bash.
 
-1. [Download and Install Docker](https://docs.docker.com/docker-for-windows/install/) 
+1. [Download and Install Docker](https://docs.docker.com/docker-for-windows/install/)
 2. If you are on Windows install the Ubuntu Bash ([Windows-Store](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6))
 3. Happy Coding!
 
@@ -145,7 +144,7 @@ To run a container and register it in Azure DevOps run `run.sh`.
 
 Example:
 
-```
+```console
 ./run.sh czon/azdo-agent:ubuntu-18.04-2.155.1 -s https://dev.azure.com/czon/ -n TestAgent01 -p DockerSamples -c -d -i
 ```
 
