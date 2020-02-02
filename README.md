@@ -11,11 +11,12 @@ This is a Docker based project for automatically generating docker images for Az
 > **Info**: The Windows images are not maintained at the moment.
 
 ## How to use these images
+
 Azure Pipelines agents must be started with account connection information, which is provided through environment variables listet below.
 
 To run the default Azure Pipelines agent image for a specific Azure DevOps account:
 
-```
+```bash
 docker run \
   -e AZDO_URL=<url> \
   -e AZDO_TOKEN=<pat> \
@@ -24,7 +25,7 @@ docker run \
 
 A more secure option for passing the personal access token is supported by mounting a file that contains the token into the container and specifying the location of this file with the `AZDO_TOKEN_FILE` environment variable. For instance:
 
-```
+```bash
 docker run \
   -v /path/to/my/token:/azdo-token \
   -e AZDO_URL=<url> \
@@ -36,16 +37,16 @@ The same applies for the usage of the `AZDO_PASSWORD` environment variable. It i
 
 Agents can be further configured with additional environment variables:
 
-- `AZDO_AGENT`: the name of the agent (default: `"$(hostname)"`)
-- `AZDO_POOL`: the name of the agent pool (default: `"Default"`)
-- `AZDO_DEPLOYMENT_POOL`: the name of the deployment pool (no default; cannot be combined with `AZDO_POOL`)
-- `AZDO_WORK`: the agent work folder (default: `"_work"`)
+-   `AZDO_AGENT`: the name of the agent (default: `"$(hostname)"`)
+-   `AZDO_POOL`: the name of the agent pool (default: `"Default"`)
+-   `AZDO_DEPLOYMENT_POOL`: the name of the deployment pool (no default; cannot be combined with `AZDO_POOL`)
+-   `AZDO_WORK`: the agent work folder (default: `"_work"`)
 
 The `AZDO_AGENT` and `AZDO_WORK` values are evaluated inside the container as an expression so they can use shell expansions. The `AZDO_AGENT` value is evaluated first, so the `AZDO_WORK` value may reference the expanded `AZDO_AGENT` value.
 
 To run a Azure DevOps agent on Ubuntu 18.04 for a specific account with a custom agent name, pool and a volume mapped agent work folder:
 
-```
+```bash
 docker run \
   -e AZDO_URL=<url> \
   -e AZDO_TOKEN=<pat> \
@@ -125,11 +126,12 @@ The agent will take only one job and than shut down and deregister itself.
 ## Development
 
 ### Getting Started
+
 > Notice: The preferred Development Environment is Windows with the integrated WSL Bash.
 
-1. [Download and Install Docker](https://docs.docker.com/docker-for-windows/install/)
-2. If you are on Windows install the Ubuntu Bash ([Windows-Store](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6))
-3. Happy Coding!
+1.  [Download and Install Docker](https://docs.docker.com/docker-for-windows/install/)
+2.  If you are on Windows install the Ubuntu Bash ([Windows-Store](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6))
+3.  Happy Coding!
 
 ### Build
 
@@ -137,20 +139,22 @@ The `update.sh` script generates Dockerfiles from  `*.templates` files.
 In order to build your Dockerimages from the Dockerfiles run `build.sh`.
 
 ### Run
+
 To run a container and register it in Azure DevOps run `run.sh`.
 
 Example:
 
-```console
+```bash
 ./run.sh czon/azdo-agent:ubuntu-18.04-2.155.1 -s https://dev.azure.com/czon/ -n TestAgent01 -p DockerSamples -c -d -i
 ```
 
 ### Contribute
 
-Build your own DockerFiles/Images based on Linux or Windows: 
- 1. Add a Template File for your variation. In order to do so create a dockerfile.template and a versions file.
- 2. Register your Template in `update.sh`, run it in order to generate a Dockerfile
- 3. Run `build.sh` to build a dockerimage from all dockerfiles.
+Build your own DockerFiles/Images based on Linux or Windows:
+
+1.  Add a Template File for your variation. In order to do so create a dockerfile.template and a versions file.
+2.  Register your Template in `update.sh`, run it in order to generate a Dockerfile
+3.  Run `build.sh` to build a dockerimage from all dockerfiles.
 
 ## Authors
 
@@ -165,5 +169,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 Based on this:
-- [microsoft/vsts-agent-docker](https://github.com/microsoft/vsts-agent-docker)
-- [Microsoft Documentation](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops)
+
+-   [microsoft/vsts-agent-docker](https://github.com/microsoft/vsts-agent-docker)
+-   [Microsoft Documentation](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops)
