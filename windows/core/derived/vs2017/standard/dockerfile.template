@@ -1,7 +1,7 @@
 # escape=`
-FROM czon/azdo-agent:$(AGENT_TAG)
+FROM czon/azdo-agent:$[AGENT_TAG]
 
-LABEL name="czon/azdo-agent:$(AGENT_TAG)-standard-vs2017" `
+LABEL name="czon/azdo-agent:$[AGENT_TAG]-standard-vs2017" `
       maintainer="CodeZ.one - Kirsten Kluge" `
       version="0.0.1"
 

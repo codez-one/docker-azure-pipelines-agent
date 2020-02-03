@@ -42,7 +42,7 @@ done
 set -- "${POSITIONAL[@]}"       # restore positional parameters
 
 
-cd "$(dirname $0)"
+cd "$(dirname "$0")"
 
 BASE_PATH=../output/ubuntu/
 
@@ -65,43 +65,44 @@ ubuntu() {
     fi
 
     echo "        Target: $TARGET_DIR"
-    mkdir -p $TARGET_DIR
-
+    mkdir -p "$TARGET_DIR"
+    
     sed \
-      -e s/'$(DOCKER_REGISTRY)'/$registry/g \
-      -e s/'$(DOCKER_NAME)'/$name/g \
-      -e s/'$(UBUNTU_VERSION)'/$UBUNTU_VERSION/g \
-      -e s/'$(AZDO_AGENT_VERSION)'/$AZDO_AGENT_VERSION/g \
-      $TEMPLATE_DIR/dockerfile.template > $TARGET_DIR/dockerfile
+      -e s/'$[DOCKER_REGISTRY]'/"$registry"/g \
+      -e s/'$[DOCKER_NAME]'/"$name"/g \
+      -e s/'$[UBUNTU_VERSION]'/"$UBUNTU_VERSION"/g \
+      -e s/'$[AZDO_AGENT_VERSION]'/"$AZDO_AGENT_VERSION"/g \
+      "$TEMPLATE_DIR/dockerfile.template" > "$TARGET_DIR/dockerfile"
 
-    if [ -f $TEMPLATE_DIR/*.sh ]; then
-      cp $TEMPLATE_DIR/*.sh $TARGET_DIR
+    if ls -d $TEMPLATE_DIR/*.sh > /dev/null 2>&1; then
+      cp $TEMPLATE_DIR/*.sh "$TARGET_DIR"
     fi
 
     if [ -n "$AZDO_AGENT_VERSION" ]; then
-      while read DOTNET_CORE_VERSION DOTNET_CORE_SDK_VERSION; do
+      while read -r DOTNET_CORE_VERSION DOTNET_CORE_SDK_VERSION; do
         DOTNET_CORE_DIR=$TARGET_DIR/dotnet/core/$DOTNET_CORE_VERSION
-        mkdir -p $DOTNET_CORE_DIR
+        mkdir -p "$DOTNET_CORE_DIR"
+
         sed \
-          -e s/'$(DOCKER_REGISTRY)'/$registry/g \
-          -e s/'$(DOCKER_NAME)'/$name/g \
-          -e s/'$(AZDO_AGENT_TAG)'/$AZDO_AGENT_TAG/g \
-          -e s/'$(DOTNET_CORE_VERSION)'/$DOTNET_CORE_VERSION/g \
-          -e s/'$(DOTNET_CORE_SDK_VERSION)'/$DOTNET_CORE_SDK_VERSION/g \
-          derived/dotnet/core/dockerfile.template > $DOTNET_CORE_DIR/dockerfile
-      done < <(cat derived/dotnet/core/versions | sed '/^\s*#/d')
+          -e s/'$[DOCKER_REGISTRY]'/"$registry"/g \
+          -e s/'$[DOCKER_NAME]'/"$name"/g \
+          -e s/'$[AZDO_AGENT_TAG]'/"$AZDO_AGENT_TAG"/g \
+          -e s/'$[DOTNET_CORE_VERSION]'/"$DOTNET_CORE_VERSION"/g \
+          -e s/'$[DOTNET_CORE_SDK_VERSION]'/"$DOTNET_CORE_SDK_VERSION"/g \
+          derived/dotnet/core/dockerfile.template > "$DOTNET_CORE_DIR/dockerfile"
+      done < <(< derived/dotnet/core/versions sed '/^\s*#/d')
     fi
     echo "        done."
   }
 
   echo "starting update..."
-  while read UBUNTU_VERSION; do
-    rm -rf $BASE_PATH$UBUNTU_VERSION
-    update $UBUNTU_VERSION
-    while read AZDO_AGENT_VERSION; do
-      update $UBUNTU_VERSION $AZDO_AGENT_VERSION
-    done < <(cat versioned/releases | sed '/^\s*#/d')
-  done < <(cat versions | sed '/^\s*#/d')
+  while read -r UBUNTU_VERSION; do
+    rm -rf "$BASE_PATH$UBUNTU_VERSION"
+    update "$UBUNTU_VERSION"
+    while read -r AZDO_AGENT_VERSION; do
+      update "$UBUNTU_VERSION" "$AZDO_AGENT_VERSION"
+    done < <(< versioned/releases sed '/^\s*#/d')
+  done < <(< versions sed '/^\s*#/d')
 
   cd ..
   echo "    done."

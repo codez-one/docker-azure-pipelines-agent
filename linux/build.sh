@@ -54,7 +54,7 @@ done
 set -- "${POSITIONAL[@]}"       # restore positional parameters
 
 # Run update to make sure to build the latest dockerfiles
-./update.sh --registry=$registry --name=$name
+./update.sh --registry="$registry" --name="$name"
 
 devider(){
   echo ""
@@ -65,9 +65,9 @@ devider(){
 devider
 
 set -e
-cd "$(dirname $0)"
+cd "$(dirname "$0")"
 
-while read dir; do
+while read -r dir; do
   echo "Build Docker Image for:"
   echo -e "\033[1;32m$dir\033[0m"
   echo ""
@@ -78,8 +78,8 @@ while read dir; do
 
   docker build \
     --compress \
-    -t $registry/$name:${dir//\//-} \
-    output/$dir
+    -t "$registry/$name:${dir//\//-}" \
+    "output/$dir"
   
   _=$((count+=1))
   
@@ -88,21 +88,21 @@ done< <(./dirs.sh)
 
 # Set the 'latest' tag to the image set in 'latest.tag' file
 LATEST_TAG=$(cat latest.tag)
-if [ -n "$(docker images -f reference=$registry/$name:$LATEST_TAG -q)" ]; then
+if [ -n "$(docker images -f reference="$registry/$name:$LATEST_TAG" -q)" ]; then
   echo "Apply 'latest' tag to: $registry/$name:$LATEST_TAG"
-  docker tag $registry/$name:$LATEST_TAG $registry/$name
+  docker tag "$registry/$name:$LATEST_TAG" "$registry/$name"
 
   devider
 fi
 
 end=$(date +%s)
 ((seconds=end-start))
-if (( $seconds > 3600 )) ; then
+if (( seconds > 3600 )) ; then
     ((hours=seconds/3600))
     ((minutes=(seconds%3600)/60))
     ((seconds=(seconds%3600)%60))
     echo "Built $count images in $hours hour(s), $minutes minute(s) and $seconds second(s)" 
-elif (( $seconds > 60 )) ; then
+elif (( seconds > 60 )) ; then
     ((minutes=(seconds%3600)/60))
     ((seconds=(seconds%3600)%60))
     echo "Built $count images in $minutes minute(s) and $seconds second(s)"

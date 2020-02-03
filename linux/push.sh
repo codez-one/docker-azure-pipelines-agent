@@ -44,13 +44,13 @@ while [[ $# -gt 0 ]]; do
 done
 set -- "${POSITIONAL[@]}"       # restore positional parameters
 
-cd "$(dirname $0)"
+cd "$(dirname "$0")"
 
-while read dir; do
-  docker push $registry/$name:${dir//\//-}
+while read -r dir; do
+  docker push "$registry/$name:${dir//\//-}"
 done < <(./dirs.sh)
 
 # Push latest tagged image if available 
-if [ -n "$(docker images -f reference=$registry/$name:latest -q)" ]; then
-  docker push $registry/$name:latest
+if [ -n "$(docker images -f reference="$registry/$name:latest" -q)" ]; then
+  docker push "$registry/$name:latest"
 fi

@@ -1,14 +1,14 @@
 # escape=`
-FROM czon/azdo-agent:windows-core-$(WINDOWS_VERSION)
+FROM czon/azdo-agent:windows-core-$[WINDOWS_VERSION]
 
-LABEL name="czon/azdo-agent:windows-core-$(WINDOWS_VERSION)-$(AGENT_VERSION)" `
+LABEL name="czon/azdo-agent:windows-core-$[WINDOWS_VERSION]-$[AGENT_VERSION]" `
       maintainer="CodeZ.one - Kirsten Kluge" `
       version="0.0.1"
 
 WORKDIR C:\TFS
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-RUN Invoke-WebRequest "https://github.com/Microsoft/vsts-agent/releases/download/v$(AGENT_VERSION)/vsts-agent-win7-x64-$(AGENT_VERSION).zip" -OutFile agent.zip; `
+RUN Invoke-WebRequest "https://github.com/Microsoft/vsts-agent/releases/download/v$[AGENT_VERSION]/vsts-agent-win7-x64-$[AGENT_VERSION].zip" -OutFile agent.zip; `
     Expand-Archive agent.zip -DestinationPath .\Agent -Force; `
     Remove-Item -Force agent.zip
 

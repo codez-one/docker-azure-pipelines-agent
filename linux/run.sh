@@ -97,9 +97,9 @@ while [[ $# -gt 0 ]]; do
 done
 set -- "${POSITIONAL[@]}"       # restore positional parameters
 
-getpassword() {
+getsecret() {
   local  __resultvar=$2
-  local  password=
+  local  secret=
   local prompt=$1
   while IFS= read -p "$prompt" -r -s -n 1 char 
   do
@@ -108,13 +108,13 @@ getpassword() {
     fi
     if [[ $char == $'\177' ]];  then
       prompt=$'\b \b'
-      password="${password%?}"
+      secret="${secret%?}"
     else
       prompt='*'
-      password+="$char"
+      secret+="$char"
     fi
   done
-  eval $__resultvar="'$password'"
+  eval "$__resultvar='$secret'"
 }
 
 if [ -z "$1" ]; then
@@ -126,14 +126,14 @@ arg_agent_auth=
 if [ "$userauth" ]; then
   user=
   password=
-  getpassword "Enter username for AZDO User:$(echo $'\n> ')" user
+  getsecret $'Enter username for AZDO User:\n> ' user
   echo $''
-  getpassword "Enter password for AZDO User:$(echo $'\n> ')" password
+  getsecret $'Enter password for AZDO User:\n> ' password
   echo $''
-  arg_agent_auth="-e AZDO_USER=$user -e AZDO_PASSWORD=$password "
+  arg_agent_auth="-e AZDO_USER=$user -e AZDO_PASSWORD=$password"
 else
   token=
-  getpassword "Enter token for AZDO User:$(echo $'\n> ')" token
+  getsecret $'Enter token for AZDO User:\n> ' token
   echo $''
   arg_agent_auth="-e AZDO_TOKEN=$token"
 fi
@@ -160,20 +160,20 @@ else
   arg_docker_interactive="-d"
 fi
 
-arg_pool_params=
+arg_pool=
 if [ -n "$deploymentpool" ]; then
-  arg_pool_params=(-e AZDO_DEPLOYMENT_POOL="$deploymentpool")
+  arg_pool="-e AZDO_DEPLOYMENT_POOL=$deploymentpool"
 else
-  arg_pool_params=(-e AZDO_POOL="$pool")
+  arg_pool="-e AZDO_POOL=$pool"
 fi
 
-docker run \
+echo docker run \
   -e AZDO_URL="$server" \
-  $arg_agent_auth \
-  "${arg_pool_params[@]}" \
+  "$arg_agent_auth" \
+  "$arg_pool" \
   -e AZDO_ENV_INCLUDE='Agent.Project=My Awesome Project,Agent.Test=blubb' \
-  $arg_azdo_agent \
-  $arg_azdo_agent_dispose \
-  $arg_docker_restart \
-  $arg_docker_interactive \
-  "$arg_docker_image" $run
+  "$arg_azdo_agent" \
+  "$arg_azdo_agent_dispose" \
+  "$arg_docker_restart" \
+  "$arg_docker_interactive" \
+  "$arg_docker_image" "$run"

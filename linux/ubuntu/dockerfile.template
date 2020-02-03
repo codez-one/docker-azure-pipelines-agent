@@ -1,6 +1,6 @@
-FROM ubuntu:$(UBUNTU_VERSION)
+FROM ubuntu:$[UBUNTU_VERSION]
 
-LABEL name="$(DOCKER_REGISTRY)/$(DOCKER_NAME):ubuntu-$(UBUNTU_VERSION)" \
+LABEL name="$[DOCKER_REGISTRY]/$[DOCKER_NAME]:ubuntu-$[UBUNTU_VERSION]" \
       maintainer="CodeZ.one - Kirsten Kluge" \
       version="0.1.0"
 

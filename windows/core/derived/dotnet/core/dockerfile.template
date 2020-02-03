@@ -1,7 +1,7 @@
 # escape=`
-FROM czon/azdo-agent:$(AGENT_TAG)
+FROM czon/azdo-agent:$[AGENT_TAG]
 
-LABEL name="czon/azdo-agent:$(AGENT_TAG)-dotnetcoresdk-$(DOTNET_CORE_SDK_VERSION)" `
+LABEL name="czon/azdo-agent:$[AGENT_TAG]-dotnetcoresdk-$[DOTNET_CORE_SDK_VERSION]" `
       maintainer="CodeZ.one - Kirsten Kluge" `
       version="0.1.0"
 
@@ -13,8 +13,8 @@ ADD https://dot.net/v1/dotnet-install.ps1 C:\\Setup\\dotnet-install.ps1
 # Use PowerShell commands to download, validate hashes, etc.
 SHELL ["powershell.exe", "-ExecutionPolicy", "Bypass", "-Command", "$ErrorActionPreference='Stop'; $ProgressPreference='SilentlyContinue'; $VerbosePreference = 'Continue';"]
 COPY ./install.dotnet.ps1 .
-RUN ./install.dotnet.ps1 -DOTNET_CORE_SDK_VERSION $(DOTNET_CORE_SDK_VERSION) -DOTNET_CORE_CHANNEL $(DOTNET_CORE_CHANNEL)
+RUN ./install.dotnet.ps1 -DOTNET_CORE_SDK_VERSION $[DOTNET_CORE_SDK_VERSION] -DOTNET_CORE_CHANNEL $[DOTNET_CORE_CHANNEL]
 
-ENV dotnetcoreversion=$(DOTNET_CORE_SDK_VERSION)
+ENV dotnetcoreversion=$[DOTNET_CORE_SDK_VERSION]
 
 SHELL ["cmd.exe", "/s", "/c"]

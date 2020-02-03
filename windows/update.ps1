@@ -21,8 +21,8 @@ function Core () {
         New-Item -Path $targetDir -ItemType Directory -Force > $null
 
         (Get-Content "$templateDir\dockerfile.template" -Raw).
-        Replace('$(WINDOWS_VERSION)', $windowsVersion).
-        Replace('$(AGENT_VERSION)', $agentVersion) |
+        Replace('$[WINDOWS_VERSION]', $windowsVersion).
+        Replace('$[AGENT_VERSION]', $agentVersion) |
             Set-Content "$targetDir\dockerfile"
 
         if (Test-Path "$templateDir\*.ps1") {
@@ -40,18 +40,18 @@ function Core () {
             # foreach ($folder in (Get-ChildItem -path ".\$sourcedir" | where-object {$_.Psiscontainer}).Name) {
             #     New-Item -Path "$targetDir\vs2017\$folder\" -ItemType Directory -Force > $null
             #     (Get-Content ".\$sourcedir\$folder\dockerfile.template" -Raw).
-            #     Replace('$(AGENT_TAG)', $agentTag).
-            #     Replace('$(WINDOWS_VERSION)', $windowsVersion).
-            #     Replace('$(AGENT_VERSION)', $agentVersion) |
+            #     Replace('$[AGENT_TAG]', $agentTag).
+            #     Replace('$[WINDOWS_VERSION]', $windowsVersion).
+            #     Replace('$[AGENT_VERSION]', $agentVersion) |
             #         Set-Content "$targetDir\vs2017\$folder\dockerfile"
             # }
             # $sourcedir = "derived\vs2017\standard"
             # foreach ($folder in (Get-ChildItem -path ".\$sourcedir" | where-object {$_.Psiscontainer}).Name) {
             #     New-Item -Path "$targetDir\vs2017\$folder\" -ItemType Directory -Force > $null
             #     (Get-Content ".\$sourcedir\$folder\dockerfile.template" -Raw).
-            #     Replace('$(AGENT_TAG)', $agentTag).
-            #     Replace('$(WINDOWS_VERSION)', $windowsVersion).
-            #     Replace('$(AGENT_VERSION)', $agentVersion) |
+            #     Replace('$[AGENT_TAG]', $agentTag).
+            #     Replace('$[WINDOWS_VERSION]', $windowsVersion).
+            #     Replace('$[AGENT_VERSION]', $agentVersion) |
             #         Set-Content "$targetDir\vs2017\$folder\dockerfile"
             # }
             #end region
@@ -61,11 +61,11 @@ function Core () {
                 $outputdir = "$targetDir\dotnet\core\$($versionsFields[0])\";
                 New-Item -Path $outputdir -ItemType Directory -Force > $null
                 (Get-Content ".\$sourcedir\dockerfile.template" -Raw).
-                Replace('$(AGENT_TAG)', $agentTag).
-                Replace('$(WINDOWS_VERSION)', $windowsVersion).
-                Replace('$(AGENT_VERSION)', $agentVersion).
-                Replace('$(DOTNET_CORE_SDK_VERSION)', $versionsFields[0]).
-                Replace('$(DOTNET_CORE_CHANNEL)', $versionsFields[1]) |
+                Replace('$[AGENT_TAG]', $agentTag).
+                Replace('$[WINDOWS_VERSION]', $windowsVersion).
+                Replace('$[AGENT_VERSION]', $agentVersion).
+                Replace('$[DOTNET_CORE_SDK_VERSION]', $versionsFields[0]).
+                Replace('$[DOTNET_CORE_CHANNEL]', $versionsFields[1]) |
                     Set-Content ($outputdir + "\dockerfile");
                 if (Test-Path "$sourcedir\*.ps1") {
                     Copy-Item "$sourcedir\*.ps1" "$outputdir" -Force
