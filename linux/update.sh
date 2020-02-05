@@ -68,10 +68,10 @@ ubuntu() {
     mkdir -p "$TARGET_DIR"
     
     sed \
-      -e s/'$[DOCKER_REGISTRY]'/"$registry"/g \
-      -e s/'$[DOCKER_NAME]'/"$name"/g \
-      -e s/'$[UBUNTU_VERSION]'/"$UBUNTU_VERSION"/g \
-      -e s/'$[AZDO_AGENT_VERSION]'/"$AZDO_AGENT_VERSION"/g \
+      -e s/'$\[DOCKER_REGISTRY\]'/"$registry"/g \
+      -e s/'$\[DOCKER_NAME\]'/"$name"/g \
+      -e s/'$\[UBUNTU_VERSION\]'/"$UBUNTU_VERSION"/g \
+      -e s/'$\[AZDO_AGENT_VERSION\]'/"$AZDO_AGENT_VERSION"/g \
       "$TEMPLATE_DIR/dockerfile.template" > "$TARGET_DIR/dockerfile"
 
     if ls -d $TEMPLATE_DIR/*.sh > /dev/null 2>&1; then
@@ -84,11 +84,11 @@ ubuntu() {
         mkdir -p "$DOTNET_CORE_DIR"
 
         sed \
-          -e s/'$[DOCKER_REGISTRY]'/"$registry"/g \
-          -e s/'$[DOCKER_NAME]'/"$name"/g \
-          -e s/'$[AZDO_AGENT_TAG]'/"$AZDO_AGENT_TAG"/g \
-          -e s/'$[DOTNET_CORE_VERSION]'/"$DOTNET_CORE_VERSION"/g \
-          -e s/'$[DOTNET_CORE_SDK_VERSION]'/"$DOTNET_CORE_SDK_VERSION"/g \
+          -e s/'$\[DOCKER_REGISTRY\]'/"$registry"/g \
+          -e s/'$\[DOCKER_NAME\]'/"$name"/g \
+          -e s/'$\[AZDO_AGENT_TAG\]'/"$AZDO_AGENT_TAG"/g \
+          -e s/'$\[DOTNET_CORE_VERSION\]'/"$DOTNET_CORE_VERSION"/g \
+          -e s/'$\[DOTNET_CORE_SDK_VERSION\]'/"$DOTNET_CORE_SDK_VERSION"/g \
           derived/dotnet/core/dockerfile.template > "$DOTNET_CORE_DIR/dockerfile"
       done < <(< derived/dotnet/core/versions sed '/^\s*#/d')
     fi
