@@ -58,6 +58,11 @@ Begin {
         $argagentauth = "--auth PAT --token $env:AZDO_TOKEN"
     }
 
+    $argagentonce = ""
+    if ($env:AZDO_AGENT_DISPOSE) {
+        $argagentonce = "--once"
+    }
+
     function Cleanup () {
         if (Test-Path ".\config.cmd") {
             Invoke-Expression "& .\config.cmd remove --unattended $argagentauth"
@@ -70,7 +75,7 @@ Begin {
 Process {
     Write-Output "Configure Agent ..."
 
-    $addcommand = "& .\config.cmd --unattended --url `"$env:AZDO_URL`" --agent `"$env:AZDO_AGENT`" --work `"$env:AZDO_WORK`" --replace $argagentauth $argpool"
+    $addcommand = "& .\config.cmd --unattended --url `"$env:AZDO_URL`" --agent `"$env:AZDO_AGENT`" --work `"$env:AZDO_WORK`" --replace $argagentauth $argpool $argagentonce"
     Write-Output $addcommand
 
     try {
