@@ -1,0 +1,47 @@
+# escape=`
+# Copyright (c) 2016 Microsoft Corporation
+# SPDX-License-Identifier: MIT
+FROM czon/azdo-agent:$[AGENT_TAG]-minimal-vs2019
+
+LABEL name="czon/azdo-agent:$[AGENT_TAG]-standard-vs2019" `
+      maintainer="CodeZ.one - Kirsten Kluge" `
+      version="0.1.0"
+
+SHELL [ "cmd", "/S", "/C" ]
+
+# Install VS components
+RUN `
+    # Install VS Build Tools
+    curl -fSLo vs_BuildTools.exe https://download.visualstudio.microsoft.com/download/pr/c7d8bceb-64c4-426d-85a2-89bc21b21245/1f07eb88f128370a60ab6d592b1e0f3deb76036a168c7e3021d0fbaf4316a5a0/vs_BuildTools.exe `
+    # Installer won't detect DOTNET_SKIP_FIRST_TIME_EXPERIENCE if ENV is used, must use setx /M
+    && setx /M DOTNET_SKIP_FIRST_TIME_EXPERIENCE 1 `
+    && start /w vs_BuildTools.exe ^ `
+        --add Microsoft.VisualStudio.Workload.MSBuildTools ^ `
+        --add Microsoft.VisualStudio.Workload.NetCoreBuildTools ^ `
+        --add Microsoft.Net.Component.4.8.SDK ^ `
+        --add Microsoft.Component.ClickOnce.MSBuild ^ `
+        --add Microsoft.VisualStudio.Component.WebDeploy ^ `
+        --quiet --norestart --nocache --wait `
+    && powershell -Command "if ($err = dir $Env:TEMP -Filter dd_setup_*_errors.log | where Length -gt 0 | Get-Content) { throw $err }" `
+    && del vs_BuildTools.exe
+
+# Install web targets
+RUN curl -fSLo MSBuild.Microsoft.VisualStudio.Web.targets.zip https://dotnetbinaries.blob.core.windows.net/dockerassets/MSBuild.Microsoft.VisualStudio.Web.targets.2019.12.zip `
+    && tar -zxf MSBuild.Microsoft.VisualStudio.Web.targets.zip -C "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools\MSBuild\Microsoft\VisualStudio\v16.0" `
+    && del MSBuild.Microsoft.VisualStudio.Web.targets.zip
+
+# Install Targeting Packs
+RUN powershell " `
+    $ErrorActionPreference = 'Stop'; `
+    $ProgressPreference = 'SilentlyContinue'; `
+    @('4.0', '4.5.2', '4.6.2', '4.7.2', '4.8') `
+    | %{ `
+        Invoke-WebRequest `
+            -UseBasicParsing `
+            -Uri https://dotnetbinaries.blob.core.windows.net/referenceassemblies/v${_}.zip `
+            -OutFile referenceassemblies.zip; `
+        Expand-Archive referenceassemblies.zip -DestinationPath \"${Env:ProgramFiles(x86)}\Reference Assemblies\Microsoft\Framework\.NETFramework\"; `
+        Remove-Item -Force referenceassemblies.zip; `
+    }"
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
