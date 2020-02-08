@@ -8,7 +8,7 @@ LABEL name="czon/azdo-agent:windows-core-$[WINDOWS_VERSION]-$[AGENT_VERSION]" `
 WORKDIR C:\TFS
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-RUN Invoke-WebRequest "https://github.com/Microsoft/vsts-agent/releases/download/v$[AGENT_VERSION]/vsts-agent-win7-x64-$[AGENT_VERSION].zip" -OutFile agent.zip; `
+RUN Invoke-WebRequest "https://vstsagentpackage.azureedge.net/agent/$[AGENT_VERSION]/vsts-agent-win-x64-$[AGENT_VERSION].zip" -OutFile agent.zip; `
     Expand-Archive agent.zip -DestinationPath .\Agent -Force; `
     Remove-Item -Force agent.zip
 
