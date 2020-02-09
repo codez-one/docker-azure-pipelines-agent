@@ -1,9 +1,9 @@
 # escape=`
 # Copyright (c) 2016 Microsoft Corporation
 # SPDX-License-Identifier: MIT
-FROM czon/azdo-agent:$[AGENT_TAG]-minimal-vs2019
+FROM czon/azdo-agent:$[AGENT_TAG]-vs2019-minimal
 
-LABEL name="czon/azdo-agent:$[AGENT_TAG]-standard-vs2019" `
+LABEL name="czon/azdo-agent:$[AGENT_TAG]-vs2019-standard" `
       maintainer="CodeZ.one - Kirsten Kluge" `
       version="0.1.0"
 

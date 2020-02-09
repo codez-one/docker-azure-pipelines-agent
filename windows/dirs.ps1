@@ -3,12 +3,10 @@ function Core () {
         [string] $baseDir
     ) {
         Write-Output "$baseDir"
-        foreach ($folder in (Get-ChildItem -path ".\derived\vs2017" | where-object {$_.Psiscontainer}).Name) {
-            Write-Output "$baseDir\vs2017\$folder"
-        }
-
-        foreach ($folder in (Get-ChildItem -path ".\derived\vs2017" | where-object {$_.Psiscontainer}).Name) {
-            Write-Output "$baseDir\vs2017\$folder"
+        foreach ($vs in ("vs2017","vs2019")) {
+            foreach ($folder in (Get-ChildItem -path ".\derived\$vs" | where-object {$_.Psiscontainer}).Name) {
+                Write-Output "$baseDir\$vs\$folder"
+            }
         }
 
         foreach ($versionsLine in Get-Content ".\derived\dotnet\core\versions" | Where-Object { $_ -notmatch '^\s*#' }) {
