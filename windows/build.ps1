@@ -1,3 +1,8 @@
+param (
+    [string]$registry = "czon",
+    [string]$name = "azdo-agent"
+)
+
 .\update.ps1
 
 Write-Output "`n------------------------------------------------------`n"
@@ -7,10 +12,10 @@ Write-Output "`n------------------------------------------------------`n"
 # this must be done in the line before ".\Output\$dir" because the image name has to be the last parameter
 
 
-foreach($dir in .\dirs.ps1){
+foreach ($dir in .\dirs.ps1) {
     Write-Output "Build Docker Image for:`n    $dir"
     docker build --compress `
-    -t czon/azdo-agent:windows-$(($dir -replace '\\','-').ToLower() ) `
+    -t $registry/$($name):windows-$(($dir -replace '\\','-').ToLower() ) `
     -m 6GB `
     ".\Output\$dir"
     Write-Output "`n------------------------------------------------------`n"
