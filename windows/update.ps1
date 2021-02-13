@@ -33,7 +33,7 @@ function Core () {
         }
 
         if ( $agentVersion ) {
-            foreach ($vs in ("vs2017","vs2019")) {
+            foreach ($vs in ("vs2019")) {
                 $sourcedir = "derived\$vs"
                 foreach ($folder in (Get-ChildItem -path ".\$sourcedir" | where-object {$_.Psiscontainer}).Name) {
                     New-Item -Path "$targetDir\$vs\$folder\" -ItemType Directory -Force > $null

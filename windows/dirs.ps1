@@ -3,7 +3,7 @@ function Core () {
         [string] $baseDir
     ) {
         Write-Output "$baseDir"
-        foreach ($vs in ("vs2017","vs2019")) {
+        foreach ($vs in ("vs2019")) {
             foreach ($folder in (Get-ChildItem -path ".\derived\$vs" | where-object {$_.Psiscontainer}).Name) {
                 Write-Output "$baseDir\$vs\$folder"
             }
