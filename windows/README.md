@@ -35,7 +35,7 @@ Lines starting with a `#` are ignored.
 
 #### core\derived
 
-This folder is for Images based on the plain Agent images. There is an example for a minimal setup in `minimal\vs2017`.  
+This folder is for Images based on the plain Agent images. There is an example for a minimal setup in `minimal\vs2019`.  
 Adding new folders here will also require to edit `update.ps1` and `dirs.ps1`
 
 #### core\setup
