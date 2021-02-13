@@ -8,7 +8,7 @@ LABEL name="czon/azdo-agent:$[AGENT_TAG]-vs2019-minimal" `
       version="0.1.0"
 
 # Install NuGet CLI
-ENV NUGET_VERSION 5.4.0
+ENV NUGET_VERSION 5.8.1
 RUN mkdir "%ProgramFiles%\NuGet" `
     && curl -fSLo "%ProgramFiles%\NuGet\nuget.exe" https://dist.nuget.org/win-x86-commandline/v%NUGET_VERSION%/nuget.exe
 
