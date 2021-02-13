@@ -3,18 +3,16 @@ function Core () {
 
     function update (
         [string] $windowsVersion,
-        [string] $agentRelease,
         [string] $agentVersion
     ) {
-        Write-Output "    running update for: $windowsVersion $agentRelease"
+        Write-Output "    running update for: $windowsVersion $agentVersion"
 
         $templateDir = ".\"
-        $targetDir = "..\Output\Core\$windowsVersion"
+        $targetDir = "..\Output\Core\$windowsVersion\$agentVersion"
         $agentTag = "windows-core-$windowsVersion"
-        if ( $agentRelease ) {
+        if ( $agentVersion ) {
             $templateDir = ".\versioned"
-            $targetDir = "$targetDir\$($agentRelease -replace '^(.*?)-(.*)','$1\$2')"
-            $agentTag += "-$agentRelease"
+            $agentTag += "-$agentVersion"
         }
     
         Write-Output "        Target: $targetDir"
@@ -34,7 +32,7 @@ function Core () {
             Copy-Item "$templateDir\setup\*" "$targetDir\setup\" -Force
         }
 
-        if ( $agentRelease ) {
+        if ( $agentVersion ) {
             foreach ($vs in ("vs2017","vs2019")) {
                 $sourcedir = "derived\$vs"
                 foreach ($folder in (Get-ChildItem -path ".\$sourcedir" | where-object {$_.Psiscontainer}).Name) {
@@ -74,8 +72,7 @@ function Core () {
         $versionsFields = $versionsLine.Split()
         update $versionsFields[0]
         foreach ($releasesLine in Get-Content .\versioned\releases | Where-Object { $_ -notmatch '^\s*#' }) {
-            $releasesFields = $releasesLine.Split()
-            update $versionsFields[0] $releasesFields[0] $releasesFields[1]
+            update $versionsFields[0] $releasesLine
         }    
     }
 
