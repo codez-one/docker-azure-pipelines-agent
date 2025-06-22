@@ -52,7 +52,7 @@ fi
 
 if [ -n "$AZDO_WORK" ]; then
   AZDO_WORK="$(eval echo "$AZDO_WORK")"
-  export AZDO_WORK=
+  export AZDO_WORK
   mkdir -p "$AZDO_WORK"
 fi
 
