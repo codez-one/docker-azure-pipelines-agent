@@ -9,7 +9,7 @@ COPY ./runAgent.sh /azdo/
 RUN chmod +x /azdo/runAgent.sh \
  && set -x \
  && cd /azdo \
- && curl -s -fSL https://vstsagentpackage.azureedge.net/agent/$[AZDO_AGENT_VERSION]/vsts-agent-linux-x64-$[AZDO_AGENT_VERSION].tar.gz -o agent.tgz \
+ && curl -s -fSL https://download.agent.dev.azure.com/agent/$[AZDO_AGENT_VERSION]/vsts-agent-linux-x64-$[AZDO_AGENT_VERSION].tar.gz -o agent.tgz \
  && mkdir agent \
  && cd agent \
  && tar -xzf ../agent.tgz \
